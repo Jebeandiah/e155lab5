@@ -57,14 +57,14 @@ void init(void) {
 
 
 int main(void) {
-printf("starting init");
+  -printf("starting init");
   init();
   while(1)
   {
     wait_millis(_TIM6, 100);
-    int rpm = (counts*10*60)/1632;
+    float rps = ((float)counts*10)/480;
     printf("counts: %d\n", counts);
-    printf("rpm: %d\n", rpm);
+    printf("rps: %f\n", rps);
     counts=0;
 
   }
@@ -72,18 +72,19 @@ printf("starting init");
 
 void pulse_received(uint8_t source_offset){
   uint8_t edge = (_GPIOA->IDR >> source_offset) & 1; //read pin to determine edge
+  //printf("edge received: %d\n", edge);
   uint32_t direction =1;
   if(source_offset!=last_source){
     if(last_source==PA8_OFFSET){
       if(last_edge==1 && edge==1) {
         direction = -1;
         }
-      if(last_edge==0 && edge==1) {
+      if(last_edge==0 && edge==0) {
         direction = -1;
         }
     }
     if(last_source==PA10_OFFSET){
-      if(last_edge==1 && edge==0) {
+       if(last_edge==1 && edge==0) {
         direction = -1;
         }
       if(last_edge==0 && edge==1) {
