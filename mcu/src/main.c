@@ -1,25 +1,15 @@
 //Author: Benjamin Lertwachara
-//Date: 9/30/28
-//Function: Initialize and comfigure GPIO and basic timers
-//to make pwm signal to play notes.
+//Date: 10/7/28
+//Function: Use interrupts to decode
+// encoder pulses as RPS
 #include "stm32l432xx.h"
 #include "GPIO.h"
+#include "main.h"
 #include "BasicTIM.h"
 #include <stdint.h>
 #include <stdio.h>
 
-#define GPIOA_BASE_ADR (0x48000000UL)
-#define TIM6_BASE_ADR (0x40001000UL)
 
-#define RCC_BASE_ADR (0x40021000UL)
-#define RCC_APB1ENR  (*(uint32_t *) (RCC_BASE_ADR + 0x58))
-#define RCC_AHB2ENR (*(uint32_t *) (RCC_BASE_ADR + 0x4C))
-
-#define PA8_OFFSET (8)
-#define PA10_OFFSET (10)
-
-#define _GPIOA ((_GPIO_TypeDef *) GPIOA_BASE_ADR)
-#define _TIM6 ((_TIM_TypeDef *) TIM6_BASE_ADR)
 
 volatile int counts =0;
 volatile uint8_t last_source =0;
@@ -55,15 +45,15 @@ void init(void) {
   __enable_irq();
 }
 
-
+  
 int main(void) {
   -printf("starting init");
   init();
   while(1)
   {
-    wait_millis(_TIM6, 100);
-    float rps = ((float)counts*10)/480;
-    printf("counts: %d\n", counts);
+    wait_millis(_TIM6, 1000);
+    float rps = ((float)counts)/(PPR*4);
+    //printf("counts: %d\n", counts);
     printf("rps: %f\n", rps);
     counts=0;
 
